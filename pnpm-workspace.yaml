@@ -1,0 +1,49 @@
+# pnpm settings for knowhub-frontend.
+#
+# This repository is a single package, not a multi-package workspace, so no
+# `packages` list is declared. The file exists because pnpm 12 reads its
+# install policy from here rather than from `.npmrc`.
+
+# The committed lockfile is the single dependency-resolution path: an install
+# that would change the resolution fails instead of silently drifting, on the
+# default `pnpm install` path and not only when `--frozen-lockfile` is passed
+# explicitly (S1 R2-R4). The one-time bootstrap that created the first
+# lockfile used `--no-frozen-lockfile` to override this deliberately.
+frozenLockfile: true
+
+# The Node baseline declared in `engines.node` is enforced rather than
+# advisory, so a contributor and CI cannot silently run different major
+# runtimes (S1 R5).
+engineStrict: true
+
+# Dependency lifecycle scripts do not run unless the package is named below.
+# The allowlist is derived mechanically from the install rather than by
+# inspection: a package is added only after pnpm has reported its build as
+# ignored and the build has been confirmed to be a genuine native compilation
+# step.
+#
+#   unrs-resolver  native Rust module resolver, reached through
+#                  eslint-config-next -> eslint-import-resolver-typescript.
+#                  Its install step selects the platform-native binding, and
+#                  the lint gate cannot resolve imports without it.
+allowBuilds:
+  unrs-resolver: true
+
+# pnpm 12 applies a default 24-hour publication cooldown and enforces it on
+# frozen installs as well as on resolution, so without these two entries
+# `pnpm install --frozen-lockfile` fails with
+# ERR_PNPM_MINIMUM_RELEASE_AGE_VIOLATION and a clean checkout cannot install.
+#
+# Both versions are the ones pinned by the approved 0B implementation plan
+# (§7.2) and both were published less than a day before the lockfile was
+# bootstrapped. The exclusion is deliberately per-version and narrow: the
+# cooldown itself is NOT disabled or lowered, and every other package remains
+# subject to it. Exact-version pinning plus the lockfile integrity hashes stay
+# the resolution authority.
+#
+# These entries become inert once the two versions age past the cooldown and
+# should be removed then. Supply-chain policy is owned by 0B-T30, not by this
+# task, so no cooldown value is declared here.
+minimumReleaseAgeExclude:
+  - jsdom@30.1.0
+  - lucide-react@1.47.0

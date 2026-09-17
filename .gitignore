@@ -1,0 +1,17 @@
+# Dependencies
+node_modules/
+
+# Next.js build output
+.next/
+
+# Generated TypeScript declarations and incremental state
+next-env.d.ts
+*.tsbuildinfo
+
+# Test output
+playwright-report/
+test-results/
+coverage/
+
+# Local overrides
+*.local
